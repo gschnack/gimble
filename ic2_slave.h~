@@ -1,0 +1,27 @@
+/* 
+ * File:   ic2_slave.h
+ * Author: gs
+ *
+ * Created on 11. November 2014, 20:19
+ */
+
+#ifndef UART_H
+#define	UART_H
+
+#ifdef	__cplusplus
+extern "C" {
+#endif
+
+
+
+
+#ifdef	__cplusplus
+}
+#endif
+
+#endif	/* UART_H */
+
+
+#include "fix6_10.h"
+
+

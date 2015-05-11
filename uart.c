@@ -13,7 +13,7 @@
 #include "fix6_10.h"
 
 
-
+#ifdef UART
 
 unsigned char txbuffer [MAX_LENGTH];
 unsigned char txhead = 0;
@@ -355,3 +355,6 @@ void print_int16( int16_t value)
 
 
 }
+
+
+#endif

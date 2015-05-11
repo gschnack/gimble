@@ -47,14 +47,14 @@
 #include "main.h"
 
 #include "encoder.h"
-#include "uart.h"
+//#include "uart.h"
 #include "fix6_10.h"
 #include "adc.h"
 #include "clarkepark.h"
-#include "uart.h"
+//#include "uart.h"
 #include "cordic.h"
 #include "control.h"
-
+#include "i2c_slave.h"
 
 
 int16_t winkel=0;
@@ -91,7 +91,10 @@ _FOSC(FCKSM_CSECMD & OSCIOFNC_OFF & POSCMD_XT & IOL1WAY_OFF);
  */
 
 
-_FPOR(PWMPIN_ON & HPOL_ON & LPOL_ON & FPWRT_PWR128);
+// _FPOR(PWMPIN_ON & HPOL_ON & LPOL_ON & FPWRT_PWR128);
+
+_FPOR(PWMPIN_ON & HPOL_ON & LPOL_ON & FPWRT_PWR128 & ALTI2C_ON);
+
 //_FPOR(PWMPIN_ON  & HPOL_OFF & LPOL_OFF & FPWRT_PWR128); // invert PWM output
 
 /* PWM mode is Port registers
@@ -214,10 +217,11 @@ int main(void) {
 
     __builtin_write_OSCCONL(OSCCON & ~(1 << 6));
 
+#ifdef UART
     RPOR3bits.RP6R = 3; // TX
     RPINR18bits.U1RXR = 1; //RX
     //RPINR18bits.U1 = 6;  //RX
-
+#endif
     // RP13   Blue  Chan B  phys pin 24
     // RP11   Yellow      CHan A  phys pin 22
     // RP7 GReen INDX            phys pin 16
@@ -237,9 +241,10 @@ int main(void) {
 
     //TRISBbits.TRISB7 = 0; // TX
 
-
+#ifdef UART
     InitUART();
-
+#endif
+    I2C1_Init( );
 
     // Interrupt 0 is currently used for Index pulse
 
@@ -247,9 +252,11 @@ int main(void) {
     //IPC0bits.INT0IP = 1;			//(7 is highest)
     //IFS0bits.INT0IF = 0;			//clear the INT0 flag
     //IEC0bits.INT0IE = 1;
+
+#ifdef UART
     IEC0bits.U1TXIE = 1;
     IEC0bits.U1RXIE = 1;
-
+#endif
     state = 0;
     //initControl();
     initEncoder();
@@ -303,6 +310,8 @@ int main(void) {
 
         //ReceivedChar = U1RXREG;
         //#ifdef NIX
+
+#ifdef UART
         if (RS232received() == 1) {
             ReceivedChar = RS232getch();
             RS232print(&ReceivedChar, 1);
@@ -425,6 +434,8 @@ int main(void) {
                 //PORTB = writeb;
             }
         }
+
+
 
         if (adcstate == '0')
             value = adc0;
@@ -915,7 +926,7 @@ int main(void) {
             //    angle =0;
         }
 
-
+#endif  // UART
         //#endif
         //redLEDON1;
         //writeb = PORTB;
@@ -926,7 +937,7 @@ int main(void) {
         //U1TXREG = 'H';
 
         //RS232print("hello\n\f",7);
-     //   __delay32((uint32_t) (8000 * velocity));
+       __delay32((uint32_t) (80000));
         //grnLEDON1;
 
         //writeb &= ~(1 << 5);
